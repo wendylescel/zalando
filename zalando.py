@@ -31,25 +31,27 @@ num_classes=y_test.shape[1]
 
 def baseline_model():
     model=Sequential()
-    model.add(Conv2D(32,(5,5),input_shape=(1,28,28), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2),strides=2))
-    model.add(Conv2D(64,(5,5),input_shape=(32,14,14), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2),strides=2))
-    #model.add(Conv2D(8,(2,2),input_shape=(1,28,28), activation='relu'))
-    #model.add(Dropout(0.1))
-    model.add(Flatten())
-    model.add(Dense(1024,activation='relu'))
+    model.add(Conv2D(32,kernel_size=(3,3),input_shape=(1,28,28),kernel_initializer='he_normal', activation='relu'))
+    model.add(MaxPooling2D((2, 2)))  
+    model.add(Dropout(0.25))
+    model.add(Conv2D(64,kernel_size=(3,3), activation='relu'))
+    model.add(MaxPooling2D((2, 2)))  
+    model.add(Conv2D(128,kernel_size=(3,3), activation='relu'))
     model.add(Dropout(0.4))
-    #model.add(Dense(10,activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(128,activation='relu'))
+    model.add(Dropout(0.3))
     model.add(Dense(num_classes, activation='softmax'))
-    
-    
+   
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.summary();
     return model 
     
 model=baseline_model()
-model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=15, batch_size=200, verbose=2)
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=50, batch_size=128, verbose=2)
 scores=model.evaluate(x_test,y_test, verbose=0)
+print('Test loss:', scores[0])
+print('Test accuracy:', scores[1])
 print("CNN error : %.2f%%" % (100-scores[1]*100))
 
 
